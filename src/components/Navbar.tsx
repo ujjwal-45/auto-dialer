@@ -12,10 +12,14 @@ const Navbar = () => {
       <nav className="flex justify-between items-center w-full  text-black px-10 py-8 ">
         <div>
           <div className="flex items-center justify-between space-x-2">
-            <Image src="/logo_2.png" alt="logo" width={50} height={40} ></Image>
-            <h1 className={`${reva.className} font-extrabold text-4xl mt-2`}>
+            
+            <Link href="/" className="flex space-x-2" >
+              <Image src="/logo_2.png" alt="logo" width={50} height={40} ></Image>
+              <h1 className={`${reva.className} font-extrabold text-4xl mt-2`}>
                DialSense
             </h1>
+            </Link>
+            
           </div>
         </div>
         <div className="flex items-center justify-between gap-10">

@@ -23,7 +23,9 @@ const ExcelViewer: React.FC = () => {
           {rows.slice(1).map((row, index) => (
             <tr key={index}>
               {row.map((cell, index) => (
-                <td className='border-2 border-black px-2 text-zinc-500' key={index}>{cell}</td>
+                <td className='border-2 border-black px-2 text-zinc-500' key={index}>
+                  {cell === null || cell === undefined ? " " : cell}
+                </td>
               ))}
             </tr>
           ))}
@@ -39,12 +41,32 @@ const ExcelViewer: React.FC = () => {
       setSelectedFileName(fileObj.name);
       const reader = new FileReader();
       reader.onload = (event) => {
-        const binaryData = event.target?.result;
-        if (binaryData) {
+        const binaryData = event.target?.result as string | undefined;
+        if (binaryData !== undefined) {
           const workbook = XLSX.read(binaryData, { type: 'binary' });
           const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-          const jsonData = (XLSX.utils.sheet_to_json(worksheet, { header: 1 })) as string[][];
-          const rows: string[][] = jsonData.map((row: unknown[]) => row.map((cell: unknown) => String(cell))); 
+
+
+         
+        // Get the range of cells
+        const range = XLSX.utils.decode_range(worksheet['!ref'] as string);
+
+        const rows: string[][] = [];
+        for (let R = range.s.r; R <= range.e.r; ++R) {
+          const row: string[] = [];
+          for (let C = range.s.c; C <= range.e.c; ++C) {
+            const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
+            const cell = worksheet[cellAddress];
+            const cellValue = cell && cell.v !== undefined ? String(cell.v) : ''; // Use empty string for empty cells
+            row.push(String(cellValue));
+          }
+          rows.push(row);
+        }
+
+
+
+          // const jsonData = (XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: true })) as string[][];
+          // const rows: string[][] = jsonData.map((row: unknown[]) => row.map((cell: unknown) => String(cell))); 
 
           const excelData = renderExcelData(rows);
           const container = containerRef.current;
